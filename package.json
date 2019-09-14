@@ -1,0 +1,23 @@
+{
+  "name": "commissions",
+  "version": "1.0.0",
+  "description": "A calculator app for calculating commission fees for cash withdrawal and deposit.",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Lopatovas/Commissions.git"
+  },
+  "keywords": [
+    "Node.js",
+    "Javascript"
+  ],
+  "author": "Edgaras Lopatovas",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Lopatovas/Commissions/issues"
+  },
+  "homepage": "https://github.com/Lopatovas/Commissions#readme"
+}
