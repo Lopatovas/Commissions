@@ -4,7 +4,7 @@ import CASH_IN from '../Config/CashIn';
 import CASH_OUT from '../Config/CashOut';
 import CUSTOMER_TYPE from '../Constants/CustomerType';
 
-import { formatValue } from './utils';
+import { formatValue, calculateWeek, retrieveUser } from './utils';
 
 const PERCENTAGE_CONVERTER = 100;
 
@@ -32,17 +32,34 @@ const cashOutLegal = (operation) => {
   return `${currency} currency is currently not supported`;
 };
 
-const cashOutNatural = (data) => {
-  console.log('natural');
+const cashOutNatural = (data, users) => {
+  const { operation, user_id, date } = data;
+  const user = retrieveUser(users, user_id);
+  const week = calculateWeek(date);
+  if (operation.currency === CURRENCY.EUR.CODE) {
+    if (user.isMaxLimitDone(week)) {
+      const result = operation.amount * (CASH_OUT[CUSTOMER_TYPE.NATURAL].PERCENTAGE / PERCENTAGE_CONVERTER);
+      return formatValue(result, CURRENCY.EUR.SMALLEST_CURRENCY_DECIMAL);
+    }
+    const taxableAmount = operation.amount - (CASH_OUT[CUSTOMER_TYPE.NATURAL].WEEK_LIMIT - user.getWeekHistory(week));
+    user.addWeekHistory(week, operation.amount);
+    if (taxableAmount > 0) {
+      const result = taxableAmount * (CASH_OUT[CUSTOMER_TYPE.NATURAL].PERCENTAGE / PERCENTAGE_CONVERTER);
+      return formatValue(result, CURRENCY.EUR.SMALLEST_CURRENCY_DECIMAL);
+    }
+    const result = 0;
+    return result.toFixed(CURRENCY.EUR.SMALLEST_CURRENCY_DECIMAL);
+  }
+  return `${operation.currency} currency is currently not supported`;
 };
 
-const cashOutCommision = (data) => {
+const cashOutCommision = (data, users = []) => {
   const { user_type, operation } = data;
   switch (user_type) {
     case CUSTOMER_TYPE.LEGAL:
       return cashOutLegal(operation);
     case CUSTOMER_TYPE.NATURAL:
-      return cashOutNatural(data);
+      return cashOutNatural(data, users);
     default:
       return `${user_type} is not a valid user`;
   }
