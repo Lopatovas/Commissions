@@ -4,7 +4,7 @@
   "description": "A calculator app for calculating commission fees for cash withdrawal and deposit.",
   "main": "app.js",
   "scripts": {
-    "test": "npm run test",
+    "test": "mocha ./src/test",
     "build": "babel --presets es2015 -d dist/ src",
     "launch": "npm run build && node dist/app.js"
   },
@@ -23,11 +23,13 @@
   },
   "homepage": "https://github.com/Lopatovas/Commissions#readme",
   "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
+    "chai": "^4.2.0",
     "eslint": "^6.4.0",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-plugin-import": "^2.18.2",
-    "babel-cli": "^6.26.0",
-    "babel-preset-es2015": "^6.24.1"
+    "mocha": "^6.2.0"
   },
   "dependencies": {
     "moment": "^2.24.0"

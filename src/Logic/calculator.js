@@ -25,7 +25,8 @@ const cashOutLegal = (operation) => {
   if (currency === CURRENCY.EUR.CODE) {
     const result = amount * (CASH_OUT[CUSTOMER_TYPE.LEGAL].PERCENTAGE / PERCENTAGE_CONVERTER);
     if (result < CASH_OUT[CUSTOMER_TYPE.LEGAL].MIN_COMMISSION) {
-      return CASH_OUT[CUSTOMER_TYPE.LEGAL].MIN_COMMISSION.toFixed(CURRENCY.EUR.SMALLEST_CURRENCY_DECIMAL);
+      return CASH_OUT[CUSTOMER_TYPE.LEGAL].MIN_COMMISSION
+        .toFixed(CURRENCY.EUR.SMALLEST_CURRENCY_DECIMAL);
     }
     return formatValue(result, CURRENCY.EUR.SMALLEST_CURRENCY_DECIMAL);
   }
@@ -38,15 +39,19 @@ const cashOutNatural = (data, users) => {
   const week = calculateWeek(date);
   if (operation.currency === CURRENCY.EUR.CODE) {
     if (user.isMaxLimitDone(week)) {
-      const result = operation.amount * (CASH_OUT[CUSTOMER_TYPE.NATURAL].PERCENTAGE / PERCENTAGE_CONVERTER);
+      const result = operation.amount
+        * (CASH_OUT[CUSTOMER_TYPE.NATURAL].PERCENTAGE / PERCENTAGE_CONVERTER);
       return formatValue(result, CURRENCY.EUR.SMALLEST_CURRENCY_DECIMAL);
     }
-    const taxableAmount = operation.amount - (CASH_OUT[CUSTOMER_TYPE.NATURAL].WEEK_LIMIT - user.getWeekHistory(week));
-    user.addWeekHistory(week, operation.amount);
+    const taxableAmount = operation.amount
+      - (CASH_OUT[CUSTOMER_TYPE.NATURAL].WEEK_LIMIT - user.getWeekHistory(week));
     if (taxableAmount > 0) {
-      const result = taxableAmount * (CASH_OUT[CUSTOMER_TYPE.NATURAL].PERCENTAGE / PERCENTAGE_CONVERTER);
+      user.addWeekHistory(week, operation.amount - taxableAmount);
+      const result = taxableAmount
+        * (CASH_OUT[CUSTOMER_TYPE.NATURAL].PERCENTAGE / PERCENTAGE_CONVERTER);
       return formatValue(result, CURRENCY.EUR.SMALLEST_CURRENCY_DECIMAL);
     }
+    user.addWeekHistory(week, operation.amount);
     const result = 0;
     return result.toFixed(CURRENCY.EUR.SMALLEST_CURRENCY_DECIMAL);
   }
@@ -54,6 +59,9 @@ const cashOutNatural = (data, users) => {
 };
 
 const cashOutCommision = (data, users = []) => {
+  if (!data) {
+    return 'No user provided';
+  }
   const { user_type, operation } = data;
   switch (user_type) {
     case CUSTOMER_TYPE.LEGAL:
